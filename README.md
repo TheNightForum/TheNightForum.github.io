@@ -1,37 +1,21 @@
 ## Welcome to The Night Forum Launcher
 
-You can use the [editor on GitHub](https://github.com/crazywolf132/TNFLauncher/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+This is a UNIVERSAL launcher for any game. It automatically updates, downloads and will run any game.
+This is the OFFICIAL Launcher the TNF (AKA: The Night Forum) uses for their games.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+### Why?
 
-### Markdown
+When I built my first game, I remember trying to find a launcher that I could use to distrobute my game to the players quickly and easily. The problem i found, they were all built for specific games and only had features for those games.
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+With this launcher, it does everything. If you need a feature, request it.
 
-```markdown
-Syntax highlighted code block
+### How to use for your game.
 
-# Header 1
-## Header 2
-### Header 3
+It is very easy to release your game with our launcher. All you have to do is create a pull request with a folder inside the /games directory of this project. Inside of that folder you need to have a zip file and a config file. All this can be achieved if you download our Game Packer. It will even give you the full instructions on how to Upload it.
 
-- Bulleted
-- List
+Once you have uploaded your game, It will take us up to 1 day MAX to accept your pull. After that, just give the users the name of the folder you made.
+From now on, that folder name is going to be a code.
 
-1. Numbered
-2. List
+### How to update my game.
 
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
-```
-
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
-
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/crazywolf132/TNFLauncher/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+So, you want to update your game? Re-Zip your game with the same name, push ur update. Go to the config file, and increase the game version.
