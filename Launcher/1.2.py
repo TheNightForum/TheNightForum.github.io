@@ -2,6 +2,11 @@ import Tkinter as Tk
 import os, time, urllib2, shutil, zipfile
 from os.path import expanduser
 
+
+#####
+## HEHE
+#####
+
 ########################################################################
 class Start(object):
     #----------------------------------------------------------------------
@@ -270,19 +275,23 @@ class Thinking():
         self.onlineVersion = float(urllib2.urlopen("{0}{1}".format(self.baseUrl, "VERSION")).read().strip("\n"))
         self.localVersion = float(local)
         if self.onlineVersion > self.localVersion:
-            return "Please wait."
             self.selfModify("", "", 1)
+            return "Please wait."
         elif self.localVersion > self.onlineVersion:
-            return "Please wait."
             self.selfModify("", "", 1)
+            return "Please wait."
         else:
             return "All is good."
 
     #----------------------------------------------------------------------
     def selfModify(self, tochange, changeto, mode):
         if mode == 1:
+            print("running")
             data = urllib2.urlopen("{0}{1}/{2}.py".format(self.baseUrl, "Launcher", self.onlineVersion)).read()
             print(data)
+            with open("main.py", 'w') as out:
+                for line in data:
+                    out.write(line)
 
 
 
