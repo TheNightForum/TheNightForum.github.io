@@ -326,7 +326,10 @@ class Start(object):
         self.gamesList = self.core.games_w_folders
         self.core.upGrannyCounter()
         self.core.grannyCheck()
-        self.core.checkLauncherUpdates(configs['Version'])
+        res = self.core.checkLauncherUpdates(configs['Version'])
+        print(res)
+        if res == True:
+            self.showFrame(6)
         if configs['FirstTime'] == "0":
             self.frameState = 1
         else:
@@ -381,8 +384,6 @@ class Start(object):
             self.core.makeConfig()
             self.loadConfig()
         #self.log.record("Loading config.", "info")
-
-
 
     #----------------------------------------------------------------------
     def saveConfig(self):
@@ -440,6 +441,9 @@ class Start(object):
             self.frameState = 3
             self.refresh()
             self.show()
+        elif frameName == 6:
+            self.log.record("Showing the Update Frame", "info")
+            subFrame = OtherFrame(self, "", 5, "", "")
 
     #----------------------------------------------------------------------
     def fill_empty(self,row,column):
@@ -632,8 +636,12 @@ class OtherFrame(Tk.Toplevel):
             YesBtn = Tk.Button(self, text="Yes", command=lambda:self.doUpdate(True))
             NoBtn = Tk.Button(self, text="No", command=lambda:self.doUpdate(False))
             Title.grid(row=0, column=1, sticky=Tk.NSEW)
-            YesBtn.grid(row=0, column=0, expand=1, sticky=Tk.NSEW)
-            NoBtn.grid(row=0, column=0, expand=1, sticky=Tk.NSEW)
+            YesBtn.grid(row=1, column=0, sticky=Tk.NSEW)
+            NoBtn.grid(row=1, column=2, sticky=Tk.NSEW)
+
+            self.columnconfigure(0, weight=1)
+            self.columnconfigure(1, weight=1)
+            self.columnconfigure(2, weight=1)
         elif self.frame_state == -1:
             """ This is the Error Frame """
             self.log.record("Loading the error frame!", "info")
@@ -752,9 +760,10 @@ class OtherFrame(Tk.Toplevel):
             ## Working out if it is the launcher or a game that is being updated...
             if self.core.LauncherNeedsUpdate == True and self.core.GameNeedsUpdate == False:
                 ## This means that it is an update for the Launcher, and not a Game
+                self.core.selfModify("", "", 1)
             elif self.core.LauncherNeedsUpdate == False and self.core.GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
-
+                print("")
         elif response == False:
            self.closeFrame()
         else:
@@ -1288,15 +1297,13 @@ class Thinking():
         self.localVersion = float(local)
         if self.onlineVersion > self.localVersion:
             self.log.record("There is a new version avaliable!", "info")
-            self.selfModify("", "", 1)
-            return "Please wait."
+            return True
         elif self.localVersion > self.onlineVersion:
             self.log.record("Local Version number is bigger than online... Going to do a fresh reinstall...", "warning")
-            self.selfModify("", "", 1)
-            return "Please wait."
+            return True
         else:
             self.log.record("No new updates found for the Launcher", "info")
-            return "All is good."
+            return False
 
     #----------------------------------------------------------------------
     def run_command(self, command):
@@ -1489,3 +1496,6 @@ if __name__ == "__main__":
     root.highlightthickness = 0
     app = Start(root)
     root.mainloop()
+    
+    
+    #LOL
