@@ -633,8 +633,8 @@ class OtherFrame(Tk.Toplevel):
             """ This is the Update-Avaliable Frame"""
             self.log.record("Loaded the update avaliable frame!", "info")
             Title = Tk.Label(self, text="There is an update!", font="Helvetica 20 bold")
-            YesBtn = Tk.Button(self, text="Yes", command=lambda:self.doUpdate(True))
-            NoBtn = Tk.Button(self, text="No", command=lambda:self.doUpdate(False))
+            YesBtn = Tk.Button(self, text="Yes", command=lambda:self.doUpdate("true"))
+            NoBtn = Tk.Button(self, text="No", command=lambda:self.doUpdate("false"))
             Title.grid(row=0, column=1, sticky=Tk.NSEW)
             YesBtn.grid(row=1, column=0, sticky=Tk.NSEW)
             NoBtn.grid(row=1, column=2, sticky=Tk.NSEW)
@@ -756,7 +756,8 @@ class OtherFrame(Tk.Toplevel):
             self.show()
 
     def doUpdate(self, response):
-        if response == True:
+        if response == "true":
+            self.log.record("User chose to do update...", "info")
             ## Working out if it is the launcher or a game that is being updated...
             if self.core.LauncherNeedsUpdate == True and self.core.GameNeedsUpdate == False:
                 ## This means that it is an update for the Launcher, and not a Game
@@ -764,7 +765,7 @@ class OtherFrame(Tk.Toplevel):
             elif self.core.LauncherNeedsUpdate == False and self.core.GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
                 print("")
-        elif response == False:
+        elif response == "false":
            self.closeFrame()
         else:
             ## This means that the response was other than 'True' or 'False'
@@ -1297,9 +1298,11 @@ class Thinking():
         self.localVersion = float(local)
         if self.onlineVersion > self.localVersion:
             self.log.record("There is a new version avaliable!", "info")
+            self.LauncherNeedsUpdate = True
             return True
         elif self.localVersion > self.onlineVersion:
             self.log.record("Local Version number is bigger than online... Going to do a fresh reinstall...", "warning")
+            self.LauncherNeedsUpdate = True
             return True
         else:
             self.log.record("No new updates found for the Launcher", "info")
@@ -1496,6 +1499,5 @@ if __name__ == "__main__":
     root.highlightthickness = 0
     app = Start(root)
     root.mainloop()
-    
-    
-    #LOL
+
+    #HEHE
