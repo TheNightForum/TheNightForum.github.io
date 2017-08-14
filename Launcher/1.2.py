@@ -14,6 +14,9 @@ grannyCounter = 0
 errorFrameRunning = 0
 keeper = []
 gameMode = False
+LauncherNeedsUpdate = False
+GameNeedsUpdate = False
+OnlineVersion = ""
 
 ########################################################################
 ## This is the main class (in the way that this is the main frame and the first to ever get called.
@@ -329,6 +332,7 @@ class Start(object):
         res = self.core.checkLauncherUpdates(configs['Version'])
         print(res)
         if res == True:
+
             self.showFrame(6)
         if configs['FirstTime'] == "0":
             self.frameState = 1
@@ -756,13 +760,16 @@ class OtherFrame(Tk.Toplevel):
             self.show()
 
     def doUpdate(self, response):
+        global LauncherNeedsUpdate
         if response == "true":
             self.log.record("User chose to do update...", "info")
             ## Working out if it is the launcher or a game that is being updated...
-            if self.core.LauncherNeedsUpdate == True and self.core.GameNeedsUpdate == False:
+            if LauncherNeedsUpdate == True and GameNeedsUpdate == False:
+                self.log.record("Its the Launcher that needs the update...", "info")
                 ## This means that it is an update for the Launcher, and not a Game
+                LauncherNeedsUpdate = False
                 self.core.selfModify("", "", 1)
-            elif self.core.LauncherNeedsUpdate == False and self.core.GameNeedsUpdate == True:
+            elif LauncherNeedsUpdate == False and GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
                 print("")
         elif response == "false":
@@ -1293,16 +1300,21 @@ class Thinking():
 
     #----------------------------------------------------------------------
     def checkLauncherUpdates(self, local):
+        global LauncherNeedsUpdate
         self.log.record("Checking Launcher for updates!", "info")
-        self.onlineVersion = float(urllib2.urlopen("{0}{1}".format(self.baseUrl, "VERSION")).read().strip("\n"))
+        data = str(urllib2.urlopen("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/VERSION").read().strip("\n"))
+        print(data)
+        global OnlineVersion
+        OnlineVersion = data
+        self.onlineVersion = float(OnlineVersion)
         self.localVersion = float(local)
         if self.onlineVersion > self.localVersion:
             self.log.record("There is a new version avaliable!", "info")
-            self.LauncherNeedsUpdate = True
+            LauncherNeedsUpdate = True
             return True
         elif self.localVersion > self.onlineVersion:
             self.log.record("Local Version number is bigger than online... Going to do a fresh reinstall...", "warning")
-            self.LauncherNeedsUpdate = True
+            LauncherNeedsUpdate = True
             return True
         else:
             self.log.record("No new updates found for the Launcher", "info")
@@ -1320,7 +1332,11 @@ class Thinking():
         self.log.record("Requested to self Modify file!", "info")
         if mode == 1:
             self.log.record("Self Modifying own file!", "warning")
-            data = urllib2.urlopen("{0}{1}/{2}.py".format(self.baseUrl, "Launcher", self.onlineVersion)).read()
+            print("{0}{1}.py".format(
+                "https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/Launcher/",
+                OnlineVersion))
+            data = urllib2.urlopen("{0}{1}.py".format("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/Launcher/", OnlineVersion)).read()
+
             print(data)
             with open("main.py", 'w') as out:
                 for line in data:
@@ -1499,5 +1515,3 @@ if __name__ == "__main__":
     root.highlightthickness = 0
     app = Start(root)
     root.mainloop()
-
-    #HEHE
