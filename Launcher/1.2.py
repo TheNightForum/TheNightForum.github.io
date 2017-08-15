@@ -1002,6 +1002,7 @@ class OtherFrame(Tk.Toplevel):
                 LauncherNeedsUpdate = False
                 self.core.selfModify("", "", 1)
                 self.core.selfModify("Version",str(urllib2.urlopen("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/VERSION").read().strip()),3)
+                self.closeFrame()
             elif self.core.LauncherNeedsUpdate == False and self.core.GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
                 self.log.record("Its the Game that needs the update...", "info")
@@ -1797,3 +1798,4 @@ if __name__ == "__main__":
     root.highlightthickness = 0
     app = Start(root)
     root.mainloop()
+#hehe
