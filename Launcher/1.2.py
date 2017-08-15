@@ -105,74 +105,187 @@ class Start(object):
             msg.grid(row=3, column=0, sticky=Tk.NSEW)
             ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
             self.fill_empty(4, 0)
+            ## We are now adding the "Next" and "Skip" buttons to the frame for the player to be able to click...
             NextBtn.grid(row=5, column=0, sticky=Tk.NSEW)
             SkipBtn.grid(row=6, column=0, sticky=Tk.NSEW)
 
+        ## This here ↓ checks if "self.frameState" = 0, if it does... we will show the user the waiting frame...
+        ## This frame rarely ever gets called. It should only ever be called if the launcher is performing a large task that takes time...
         if self.frameState == 0:
+            ## With this ↓ we are logging that we have switched to the "Initialising Frame", AKA: Waiting frame...
             self.log.record("Initialising Loading frame", "info")
+            ## Currently, with this ↓ line of code, we are adding the Tkinter Label that says "Please Wait..."
             wait = Tk.Label(self.frame, text="Please Wait...", font="Helvetica 16 bold")
+            ## We are now adding that "wait" variable (which is the Tkinter Label) to the frame at row 1, column 1
             wait.grid(row=1,column=1,sticky=Tk.NSEW)
+        ## This here ↓ checks if "self.frameState" = 1, if it does... we will show the user the Main Frame...
+        ## This main frame is where all the fun happens. This should be first screen the users see's when using the app every time...
+        ## thought, this screen will change depending on if the user is new, or if they are in the settings panel or not...
         elif self.frameState == 1:
+            ## We are now going to log that we are on the main screen.
             self.log.record("Loading MainFrame", "info")
+            ## We are assigning the variable "Logo" to the Tkinter Label that says "TNF Launcher"
             Logo = Tk.Label(self.frame, text="TNF Launcher", font="Helvetica 20 bold")
+            ## ↓ This is going to check if there are any games installed on the system by checking the "configs" variable...
+            ## If this = "1", it means that there are some games installed, otherwise... if it = "0"... this means there are none installed.
             if configs['GotGames'] == "1":
+                ## If there are some games installed, we want to add a "Games" button and assign it to the "Play" variable.
+                ## When this button is pressed we want to run the "self.showFrame(2)" function. This will mean that we launch
+                ## a frame from the "OtherFrame" class when the user clicks this button.
                 Play = Tk.Button(self.frame, text="Games", command=lambda:self.showFrame(2))
+            ## We are now going to add the "Add" button, and assign it to the variable "Add".
+            ## When this button is pressed, we are going to run the command "self.showFrame(1)". This will mean that we launch
+            ## a frame from the "OtherFrame" class when the user clicks this button.
             Add = Tk.Button(self.frame, text="Add", command=lambda:self.showFrame(1))
+            ## With this ↓ code, we are checking if the variable/setting "DevMode" has been assigned inside of the "configs" variable.
+            ## If it has, we are going to check to see if the value of it is = 1... if it is, we are going to run the
+            ## if statement to then add another button to the field. Otherwise, if it is anything else... we will ignore it
             if int(configs['DevMode']) == 1:
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(4, 0)
+                ## We are now adding the "Create" button and assigning it to the variable "Create". When this button
+                ## is pressed, we are going to run the command "self.showFrame(4)". This will mean that when the user
+                ## clicks the button... we will run the "OtherFrame" class to display the correct frame.
                 Create = Tk.Button(self.frame, text="Create", command=lambda:self.showFrame(4))
+                ## We are now assigning the button to row 5, column 0 in the on-screen grid.
                 Create.grid(row=5, column=0, sticky=Tk.NSEW)
+            ## With this code ↓ we are now creating a "Settings" button and assigning it to the variable "Settings".
+            ## When this button is pressed/clicked... the command "self.showFrame(3)" will be run. This will execute
+            ## the "OtherFrame" class and get it to display to us the correct frame we require.
             Settings = Tk.Button(self.frame, text="Settings", command=lambda:self.showFrame(3))
+            ## We are now adding the most important button of all. The "Quit" button, we are then assigning it to the
+            ## variable "Quit". When this button is pressed, it runs the "self.shutdown" command. This means that it
+            ## will kill all the frames currently running and stop the application.
             Quit = Tk.Button(self.frame, text="Quit", command=self.shutdown)
 
+            ## Now we are getting into the fun stuff! We are finally assigning most of the fields to their placement on
+            ## screen with the "grid" method. This is required to show all the elements on the screen.
+            ## Below ↓ we are adding the "Logo" field which we set above. This is going to go to row 0, column 0 in the on-screen grid.
             Logo.grid(row=0,column=0, sticky=Tk.NSEW)
             ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
             self.fill_empty(1, 0)
-            if not len(self.gamesList) == 0:
+            ## Right below ↓ us here is the if statement to work out if we have any games at all. If we do, we will run
+            ## the statement, otherwise we will ignore it and skip to below.
+            if int(configs['GotGames']) == 1:
+                ## According to this, we have some games. Therefore we will need to show the "Play" feild on the screen.
+                ## We are going to be displaying this field at row 2, column 0 in the on-screen grid.
                 Play.grid(row=2,column=0, sticky=Tk.NSEW)
+            ## We are now passed the if-statement, so this means that this field will be added regardless of if we have
+            ## any games or not. We are now adding the "Add" feild, and we are placing it at row 3, column 0 of the on-screen grid.
             Add.grid(row=3,column=0, sticky=Tk.NSEW)
             ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
             self.fill_empty(6, 0)
+            ## Here ↓ we are adding the "Settings" field to the on-screen grid at the location row 7, column 0.
+            ## The reason for the massive jump in numbers is to compencate for the posibility of the "Create" field being added.
+            ## Even if the "Create" field is not added... We still keep it at row 7, as it will just move up as there is nothing in the way.
             Settings.grid(row=7, column=0, sticky=Tk.NSEW)
+            ## We are now going to add the "Quit" field to the on-screen grid at lication row 8, column 0.
+            ## Much like the above "Settings" feild... we have a high number for the row... as it will just move up if there is nothing in the way.
             Quit.grid(row=8, column=0, sticky=Tk.NSEW)
 
+        ## Now, we are going to start checking if "self.frameState" = 2. If it does, we are going to display the "Settings Frame" to the user.
         elif self.frameState == 2:
+            ## First of all, we start off by logging what is happening. We say "Settings Frame started..."
+            ## so then in the log, if there is an error... we can try to re-create the issue to then fix it.
             self.log.record('Settings Frame started...', 'info')
+            ## We now start by making a few internal variables that are only avaliable to this class.
+            ## The reason why most of the lists start with 'No'... is because in a list, that first item is at position 0...
+            ## and in binary. 0 means off, and 1 means on. So... making it 0, makes it easier to remember what it means
+            ## if you latter read through the code...
+            ## "self.opt" is a "StringVar"... which means it holds a string.
             self.opt = Tk.StringVar()
+            ## "self.options" is a list. This holds all the possible options to go into "self.opt"
             self.options = ["Errors Only", "Warnings Only", "Info Only", "Debug Only", "Errors and Warnings", "Warnings and Info", "Game info only", "All"]
+            ## "self.devString" is a "StringVar"... which means it holds a string.
             self.devString = Tk.StringVar()
+            ## "self.devoption" is a list. This holds all the possible options to go into "self.devString"
             self.devoption = ['No', 'Yes']
+            ## "self.GrannyHolder" is a "StringVar"... which means it holds a string.
             self.GrannyHolder = Tk.StringVar()
+            ## "self.GrannyOptions" is a list. This holds all the possible options to go into "self.GrannyHolder"
             self.GrannyOptions = ['No', 'Yes']
+            ## "self.VersionHolder" is a "StringVar"... which means it holds a string.
             self.VersionHolder = Tk.StringVar()
+            ## "self.VersionOps" is a list. This holds all the possible options to go into "self.VersionHolder".
             self.VersionOps = ['Decide at the time', 'Latest']
+            ## "self.KeepVersionsHolder" is a "StringVar"... which means its holds a string.
             self.keepVersionsHolder = Tk.StringVar()
+            ## "self.keepVersionsOps" is a list. This holds all the possible options to go into "self.keepVersionsHolder"
             self.keepVersionsOps = ['No', 'Yes']
+            ## "self.BackupOptHolder" is a "StringVar"... which means it holds a string.
             self.BackupOptHolder = Tk.StringVar()
+            ## "self.BackupOptOps" is a list. This holds all the possible options to go into "self.BackupOptHolder"
             self.BackupOptOps = ['No', 'Yes']
+            ## "self.BackupIntHolder" is a "StringVar"... which means it holds a string.
             self.BackupIntHolder = Tk.StringVar()
+            ## "self.BackupIntOps" is a list. This holds al teh possible options to go into "self. BackupIntHolder"
             self.BackupIntOps = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]
 
+            ## We are now going to do some searching to set the "StringVar" variables to the current setting
+            ## that is saved in the config file. This is good as when the user looks at the page, they can see
+            ## all the current settings and not have to change every single setting each time...
+            ## We are now searching for the "Logging" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['Logging'])
+            ## We are now going to set "self.opt" to the item in "self.options" that is at the position of
+            ## the returned number that is assigned to "num"
             self.opt.set(self.options[num])
+            ## We are now searching for the "DevMode" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['DevMode'])
+            ## We are now going to set "self.devString" to the item in "self.devoption" that is at the the possition of
+            ## the returned number that is assigned to "num"
             self.devString.set(self.devoption[num])
+            ## We are now searching for the "GrannyChecker" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['GrannyChecker'])
+            ## We are now going to set "self.GrannyHolder" to the item in "self.GrannyOptions" that is at the position of
+            ## the returned number that is assigned to "num"
             self.GrannyHolder.set(self.GrannyOptions[num])
+            ## We are now searching for the "GetVersion" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['GetVersion'])
+            ## We are now going to set "self.VersionHolder" to the item in "self.VersionOps" that is at the position of
+            ## the returned number that is assigned to "num"
             self.VersionHolder.set(self.VersionOps[num])
+            ## We are now searching for the "KeepVersions" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['KeepVersions'])
+            ## We are now going to set "self.keepVersionHolder" to the item in "self.keepVersionsOps" that is at the position
+            ## of the returned number that is assigned to "num"
             self.keepVersionsHolder.set(self.keepVersionsOps[num])
+            ## We are now searching for the "Backups" field in the "configs" variable... and we are going
+            ## to get the returned value of that, and assign it to the variable "num"
             num = int(configs['Backups'])
+            ## We are now going to set "self.BackupOptHolder" to the item in "self.BackupOptOps" that is at the position
+            ## of the returned number that is assigned to "num"
             self.BackupOptHolder.set(self.BackupOptOps[num])
+            ## We are going to do something different now. As we have decided that the Backup Variable and the Backup Timer variable
+            ## are going to be related. When the "self.BackupOptHolder" is = 0, then the "self.BackupIntHolder" is going to be equal to 0
             if self.BackupOptHolder == "0":
+                ## This will only run if "self.BackupOptHolder" is = 0.
+                ## As it is clearly = 0, we are going to set "self.BackupIntHolder" to that of whatever is at position 0
+                ## in the "self.BackupIntOps" list.
                 self.BackupIntHolder.set(self.BackupIntOps[0])
+            ## We are now searching for the "BackupInt" field in the "configs" variable... and we are going to
+            ## get the returned value of that, and assign it to the variable "num"
             num = int(configs['BackupInt'])
+            ## We are now going to set "self.BackupIntHolder" to the item in "self.BackupIntOps" that is at the position of
+            ## the returned number that is assigned to "num"
             self.BackupIntHolder.set(self.BackupIntOps[num])
 
+            ## Here is where the fun begins. We start to render the pages on the screen aswell as the other info.
+            ## We are now making a "Logo" variable outside of any of the pages as this will show up on all the pages.
             Logo = Tk.Label(self.frame, text="Launcher - Settings", font="Helvetica 20 bold")
+            ## We are now checking to see if "self.pageNum" is = 1. If it is, then we are going to load the first page.
+            ## self.pageNum should always be = 1 on first launch as it is manually defined above in the __init__ function.
             if self.pageNum == 1:
+                ## We are now rendering the first page. Everything inside of here is just setting up the
+                ## variables to have Tkinter widgest assigned to. So then they can be latter drawn on screen.
+                ## The reason why I did not add the code that adds all of these to the on-screen grid, to here... is
+                ## because it makes it rather messier and harder to read and edit than if it were in a seperate place.
+
+                ## I feel i dont need explain what this is doing, as it is just assigning tkinter widgets to variable names.
                 LoggingTitle = Tk.Label(self.frame, text="Logging Level:")
                 LoggingOptions = Tk.OptionMenu(self.frame,self.opt,*self.options)
                 DeveloperTitle = Tk.Label(self.frame, text="Developer Mode:")
@@ -182,7 +295,11 @@ class Start(object):
                 VersionTitle = Tk.Label(self.frame, text="Version to get:")
                 VersionOptions = Tk.OptionMenu(self.frame,self.VersionHolder,*self.VersionOps)
 
+            ## This ↓ is now checking if the "self.pageNum" is = 2.... If so, we will load the 2nd page.
+            ## If it is anything else than one of these 2 pages... it will not load anything. It will just show a blank screeen.
             elif self.pageNum == 2:
+                ## This page is also just loading the tkinter widgets and adding them to variable names to latter be
+                ## added to the page (down below)...
                 KeepTitle = Tk.Label(self.frame, text="Keep All Versions:")
                 KeepOptions = Tk.OptionMenu(self.frame, self.keepVersionsHolder,*self.keepVersionsOps)
                 BackUpTitle = Tk.Label(self.frame, text="Enable Backups?")
@@ -190,96 +307,154 @@ class Start(object):
                 BackUpTimeTitle = Tk.Label(self.frame, text="Backup Intervals:")
                 BackUpTimeOps = Tk.OptionMenu(self.frame,self.BackupIntHolder,*self.BackupIntOps)
 
+            ## These next 4 items are just Tkinter Button Widgets being assigned to the variables.
+            ## The reason why these are not placed inside one the "self.pageNum" arguements... is because it is going
+            ## to be displayed on all the pages regardless... This will always be true, unless stated otherwise.
             NextPage = Tk.Button(self.frame, text="Next Page →", command=lambda:self.changePage(self.pageNum+1))
             BackPage = Tk.Button(self.frame, text="← Previous Page", command=lambda:self.changePage(self.pageNum-1))
             SaveBtn = Tk.Button(self.frame, text="Save", command=lambda:self.saveConfig())
             BackBtn = Tk.Button(self.frame, text="Back", command=lambda:self.showFrame(0))
             #--------------------------------------------------------#
+
+            ## We are now going to start adding all these variables to the on-screen grid...
+            ## Adding "Logo" to position row=0,column=0
             Logo.grid(row=0, column=0, sticky=Tk.NSEW)
+            ## If we are currently on pageNum 1, we will load the items in the if statement.
             if self.pageNum == 1:
+                ## Going to start drawing all the required fields to be displayed on the first page.
                 #--------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(1, 0)
                 #--------------------------------------------------------#
+                ## Here ↓ we are adding both "LoggingTitle" and "LoggingOptions" so they can both be rendered together on the screen.
+                ## These are both together so then they can be easily seen by the user of which ones the title corresponds to
                 LoggingTitle.grid(row=2, column=0, sticky=Tk.NSEW)
                 LoggingOptions.grid(row=3, column=0, sticky=Tk.NSEW)
                 #--------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(4, 0)
                 #--------------------------------------------------------#
+                ## Here ↓ we are adding both "DeveloperTitle" and "DeveloperOptions"... These are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 DeveloperTitle.grid(row=5, column=0, sticky=Tk.NSEW)
                 DeveloperOptions.grid(row=6, column=0, sticky=Tk.NSEW)
                 #--------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(7, 0)
                 #--------------------------------------------------------#
+                ## Here ↓ we are adding both "GrannyCheckTitle" and "GrannyCheckOptions"... These are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 GrannyCheckTitle.grid(row=8, column=0, sticky=Tk.NSEW)
                 GrannyCheckOptions.grid(row=9, column=0, sticky=Tk.NSEW)
                 #--------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(10, 0)
                 #--------------------------------------------------------#
+                ## Here ↓ we are adding both "VersionTitle" and "VersionsOptions"... These are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 VersionTitle.grid(row=11, column=0, sticky=Tk.NSEW)
                 VersionOptions.grid(row=12, column=0, sticky=Tk.NSEW)
                 #--------------------------------------------------------#
+            ## Here we are just checking if the pageNum is = 2, as it isnt = 1... If it doesnt = 1 or 2... then it will be ignored and show nothing.
             elif self.pageNum == 2:
                 # --------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(1, 0)
                 # --------------------------------------------------------#
+                ## Here ↓ we are adding both "KeepTitle" and "KeepOptions"... These are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 KeepTitle.grid(row=2, column=0, sticky=Tk.NSEW)
                 KeepOptions.grid(row=3, column=0, sticky=Tk.NSEW)
                 # --------------------------------------------------------#
                 ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
                 self.fill_empty(4, 0)
                 # --------------------------------------------------------#
+                ## Here ↓ we are adding both "BackUpTitle" and "BackUpOps"... these are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 BackUpTitle.grid(row=5, column=0, sticky=Tk.NSEW)
                 BackUpOps.grid(row=6, column=0, sticky=Tk.NSEW)
+                ## Here ↓ we are adding both "BackUpTimeTitle" abd "BackUpTimeOps"... these are both in the same area together, so then
+                ## the user will be able to see what the title corresponds with.
                 BackUpTimeTitle.grid(row=7, column=0, sticky=Tk.NSEW)
                 BackUpTimeOps.grid(row=8, column=0, sticky=Tk.NSEW)
 
                 # --------------------------------------------------------#
 
+            ## We are now rendering everything that will be at the bottom of the screen.
+            ## These are not in the the pageNum sections as they will be persistent at the bottom of the page.
             ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
             self.fill_empty(13, 0)
             #--------------------------------------------------------#
-            NextPage.grid(row=14, column=0, sticky=Tk.NSEW)
+            ## Here ↓ we are adding the "Next Page" button. This will be visible on every page except the last page...
+            ## Which just so happens to be the second page. HAHAHA... soz, ran out of ideas for settings.
+            if self.pageNum < 2:
+                ## If the self.pageNum is lower than 2, we will display the NextPage button, otherwise we will skip it.
+                NextPage.grid(row=14, column=0, sticky=Tk.NSEW)
+            ## Here ↓ we are adding the "Back Page" button. This will only be visible if the self.pageNum is greater than 1...
             if self.pageNum > 1:
+                ## Adding the BackPage button now...
                 BackPage.grid(row=15, column=0, sticky=Tk.NSEW)
 
             #--------------------------------------------------------#
             ## Here ↓ we are making an empty space to make it look cleaner and easier to read... by using the "fill_empty" function.
             self.fill_empty(16, 0)
             #--------------------------------------------------------#
+            ## Now adding the "Save" and "Back" buttons to the screen so the user can save and leave the settings page.
             SaveBtn.grid(row=17, column=0, sticky=Tk.NSEW)
             BackBtn.grid(row=18, column=0, sticky=Tk.NSEW)
             #--------------------------------------------------------#
+        ## Checking if "self.frameState" is = 3. If it is... we are going to display the "Next Page" for the tutorial screen.
         elif self.frameState == 3:
+            ## First we are going to log what is happening so if for some reason there is a major error... we are going to be able
             self.log.record("Showing next page of guide!", "info")
+            ## For convience so we can see where abouts the error is... we are going to say what page we are currently on...
             self.log.record("Current page is {0}".format(self.pageNum), "info")
+            ## We are now going to render the fields onto the screen... But first, we must assign
+            ## the Tkinter widgets to variables...
             Logo = Tk.Label(self.frame, text="TNF - Tutorial", font="Helvetica 16 bold")
+            ## We are adding a "Next" button that executes the "self.changePage(self.pageNum+1" command when clicked.
+            ## This will increase the pageNum counter... so then we can see the next page.
             NextBtn = Tk.Button(self.frame, text="Next Page →", command=lambda:self.changePage(self.pageNum+1))
+            ## We are now adding a "Back" button that executes the "self.changePage(self.pageNum-1)" command when clicked.
+            ## This will decrease the pageNum counter... so then we can see the previous page.
             BackBtn = Tk.Button(self.frame, text="← Previous Page", command=lambda:self.changePage(self.pageNum-1))
+            ## This "Finished" button executes the "self.finished_tut()" function that resets the "pageNum" counter
+            ## when clicked. This will only be visible on the final frame...
             FinishBtn = Tk.Button(self.frame, text="Finished!", command=lambda:self.finished_tut())
+            ## We are now starting a check to see what page we need to load...
             if self.pageNum == 1:
+                ## We are now displaying the First Page...
+                ## We are just loading the Sub-Title and setting it to say "Adding new games..."
                 Title = Tk.Label(self.frame, text="Adding new games...")
-
+                ## Here ↓ we are loading a text-box that is disabled from user editing...
+                ## We are also inserting the text from "self.show_tut("Adding")"....
                 info = Tk.Text(self.frame, borderwidth=3, width=35, height=11, relief="sunken")
                 info.insert(Tk.END, str(self.show_tut("Adding")))
                 info.config(font=("consolas", 12), wrap='word', state=Tk.DISABLED)
 
+            ## We are now checking if the pageNum is = 2...
             elif self.pageNum == 2:
+                ## We are now just loadin the Sub-Title and setting it to say "Game code..."
                 Title = Tk.Label(self.frame, text="Game code...")
 
-
+                ## Here we are doing some sneaky little trick to see if there are any games manually installed already.
+                ## As this is the "FirstTime" screen... there shouldnt be... but if there is... we will display a message
+                ## saying that they must already know how to add games. Otherwise, we will show them how to add games...
+                ## Along with a text box so they must add atleast one game first.
                 if configs['GotGames'] == "1":
+                    ## If the user already has games, we will show them "self.show_tut("GotGames")"....
                     info = Tk.Text(self.frame, borderwidth=3, width=35, height=5, relief="sunken")
                     info.insert(Tk.END, str(self.show_tut("GotGames")))
                 else:
+                    ## If the user does not already have games... we will show them "self.show_tut("Add")"...
                     info = Tk.Text(self.frame, borderwidth=3, width=35, height=15, relief="sunken")
                     info.insert(Tk.END, str(self.show_tut("Add")))
+                ## Here we are just setting the text field to always be disabled from user interaction.
+                ## We have it here and not in both of the if-else statements... is so it can apply
+                ## to either one... and it takes up less lines of code.
                 info.config(font=("consolas", 12), wrap='word', state=Tk.DISABLED)
 
+                ## Here we are just setting up the "Add Game" button, but only if there are zero games detected in the system.
                 if configs['GotGames'] == "0":
                     AddBtn = Tk.Button(self.frame, text="Add Game", command=lambda:self.showFrame(1))
                     AddBtn.grid(row=5, column=0, sticky=Tk.NSEW)
@@ -330,9 +505,7 @@ class Start(object):
         self.core.upGrannyCounter()
         self.core.grannyCheck()
         res = self.core.checkLauncherUpdates(configs['Version'])
-        print(res)
         if res == True:
-
             self.showFrame(6)
         if configs['FirstTime'] == "0":
             self.frameState = 1
@@ -448,6 +621,7 @@ class Start(object):
         elif frameName == 6:
             self.log.record("Showing the Update Frame", "info")
             subFrame = OtherFrame(self, "", 5, "", "")
+            self.hide()
 
     #----------------------------------------------------------------------
     def fill_empty(self,row,column):
@@ -504,6 +678,7 @@ class OtherFrame(Tk.Toplevel):
         self.core           = Thinking()
         self.gameConfigs    = game_configs
         self.frame_state    = frameState
+        self.code           = ""
 
         if not message == "":
             self.message = message
@@ -583,7 +758,7 @@ class OtherFrame(Tk.Toplevel):
                 updateBtn.grid(row=3, column=1, sticky=Tk.NSEW)
                 uninstallBtn.grid(row=3, column=2, sticky=Tk.NSEW)
             else:
-                self.changeFrame()
+                self.log.record("We have detected that there is an update... Just going to workout if we are allowed to auto-update...", "warning")
 
         elif self.frame_state == 4:
             """ This is the Developer frame """
@@ -646,6 +821,24 @@ class OtherFrame(Tk.Toplevel):
             self.columnconfigure(0, weight=1)
             self.columnconfigure(1, weight=1)
             self.columnconfigure(2, weight=1)
+        elif self.frame_state == 6:
+            """ This is the Multiple-Versions-Found Frame"""
+            self.log.record("Loaded the Multiple-Versions-Found Frame", "info")
+
+            _tokens = self.message.split("$x")
+            _list = _tokens[1].split("$i")
+            VersionHolder = Tk.StringVar()
+            VersionOps = _list
+            del VersionOps[-1]
+            VersionHolder.set(VersionOps[-1])
+
+
+            Title = Tk.Label(self, text=_tokens[0], font="Helvetica 16 bold")
+            Opts = Tk.OptionMenu(self,VersionHolder,*VersionOps)
+            Btn = Tk.Button(self, text="Get!", command=lambda:self.getGameVersion(_tokens[-1], VersionHolder.get()))
+            Title.grid(row=0, column=0, sticky=Tk.NSEW)
+            Opts.grid(row=1, column=0, sticky=Tk.NSEW)
+            Btn.grid(row=2, column=0, sticky=Tk.NSEW)
         elif self.frame_state == -1:
             """ This is the Error Frame """
             self.log.record("Loading the error frame!", "info")
@@ -728,16 +921,42 @@ class OtherFrame(Tk.Toplevel):
             result = self.core.checkIfInstalled(code)
             if result == "got":
                 self.log.record("'{0}' is already installed!".format(code.upper()), "warning")
-                self.changeFrame(-1, "Sorry, this game is already installed.")
+                returned = self.core.versionGrabber(code, "versions.list")
+                if not returned == "":
+                    _list = returned.split("\n")
+                    path = "{0}/{1}/{2}/".format(self.core.path, "games", code)
+                    returned = ""
+                    for item in _list:
+                        item = item.strip()
+                        if not os.path.exists("{0}{1}".format(path, item)):
+                            if returned == "":
+                                returned += "{0}".format(item)
+                            else:
+                                returned += "$i{0}".format(item)
+                        else:
+                            pass
+                    self.changeFrame(6,"We have found multiple versions of the game.\nWhich one would you like?$x{0}$x{1}".format(returned, code))
+                else:
+                    self.changeFrame(-1, "Sorry, this game is already installed.")
             elif result == True:
                 self.log.record("Going to install '{0}'".format(code.upper()), "info")
                 self.changeFrame(-2, "Please wait whilst we install your game!")
-                self.core.downloadLink()
+                ## Here we are going to check if there are multiple versions of the game...
+                ## What we will do is, we will consault the "version.list" file... if it exsists... then there are more versions...
+                returned = self.core.versionGrabber(code, "version")
+                self.core.downloadLink(code, returned.strip())
                 self.log.record("Game installed!", "info")
                 self.changeFrame(-2, "Done!")
             elif result == False:
                 self.log.record("Game code is invalid.", "warning")
                 self.changeFrame(-1, "Sorry, That game code is invalid.")
+
+    # ----------------------------------------------------------------------
+    def getGameVersion(self, code, version):
+        self.changeFrame(-2, "Please wait whilst we install your game!")
+        self.core.downloadLink(code, version.strip())
+        self.log.record("Game installed!", "info")
+        self.changeFrame(-2, "Done!")
 
     #----------------------------------------------------------------------
     def delGame(self):
@@ -759,6 +978,7 @@ class OtherFrame(Tk.Toplevel):
             self.refresh()
             self.show()
 
+    # ----------------------------------------------------------------------
     def doUpdate(self, response):
         global LauncherNeedsUpdate
         if response == "true":
@@ -769,6 +989,7 @@ class OtherFrame(Tk.Toplevel):
                 ## This means that it is an update for the Launcher, and not a Game
                 LauncherNeedsUpdate = False
                 self.core.selfModify("", "", 1)
+                self.core.selfModify("Version",str(urllib2.urlopen("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/VERSION").read().strip()),3)
             elif LauncherNeedsUpdate == False and GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
                 print("")
@@ -892,22 +1113,33 @@ class Thinking():
             self.log.record("URL ERROR: Could not find address!", "warning")
             return False
 
-    #----------------------------------------------------------------------
-    def downloadLink(self):
+    # ----------------------------------------------------------------------
+    def versionGrabber(self, code, file):
+        URL = "{0}/Games/{1}/{2}".format(self.baseUrl, code, file)
+        result = self.checkUrlItem(URL)
+        if result == True:
+            return urllib2.urlopen(URL).read()
+        else:
+            ## Returning nothing so then it can make the check easier...
+            return ""
+
+    # ----------------------------------------------------------------------
+    def downloadLink(self, code, version):
         self.log.record("Beginning game download...", "info")
-        response = urllib2.urlopen("{0}{1}.zip".format(self.GameURL, self.GameCode))
+        response = urllib2.urlopen("{0}/Games/{1}/{2}.zip".format(self.baseUrl, code, version))
         zipcontent= response.read()
-        with open("{0}/{1}/{2}.zip".format(self.path, "temp", self.GameCode), 'w') as f:
+        with open("{0}/{1}/{2}.zip".format(self.path, "temp", version), 'w') as f:
             f.write(zipcontent)
         self.log.record("Done.", "info")
-        self.unZipGame()
+        self.unZipGame(code, version)
 
     #----------------------------------------------------------------------
-    def unZipGame(self):
+    def unZipGame(self, code, version):
         self.log.record("Unzipping game.", "info")
-        path = "{0}/{1}/{2}.zip".format(self.path, "temp", self.GameCode)
+        path = "{0}/{1}/{2}.zip".format(self.path, "temp", version)
         zip_ref = zipfile.ZipFile(path, 'r')
-        zip_ref.extractall("{0}/{1}/{2}/".format(self.path, "games", self.GameCode))
+
+        zip_ref.extractall("{0}/{1}/{2}/{3}".format(self.path, "games", code, version))
         zip_ref.close()
         try:
             self.log.record("Trying to delete game zip!", "info")
@@ -1303,7 +1535,6 @@ class Thinking():
         global LauncherNeedsUpdate
         self.log.record("Checking Launcher for updates!", "info")
         data = str(urllib2.urlopen("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/VERSION").read().strip("\n"))
-        print(data)
         global OnlineVersion
         OnlineVersion = data
         self.onlineVersion = float(OnlineVersion)
@@ -1332,12 +1563,7 @@ class Thinking():
         self.log.record("Requested to self Modify file!", "info")
         if mode == 1:
             self.log.record("Self Modifying own file!", "warning")
-            print("{0}{1}.py".format(
-                "https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/Launcher/",
-                OnlineVersion))
             data = urllib2.urlopen("{0}{1}.py".format("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/Launcher/", OnlineVersion)).read()
-
-            print(data)
             with open("main.py", 'w') as out:
                 for line in data:
                     out.write(line)
