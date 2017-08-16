@@ -744,21 +744,34 @@ class OtherFrame(Tk.Toplevel):
 
                 self.log.record("Loading {0}'s frame!'".format(self.message), "info")
                 Title = Tk.Label(self, text=self.message.upper(), font="Helvetica 16 bold")
-                Version = Tk.Label(self, text="Version {0}".format(self.gameConfigs['Version']))
+                Version = Tk.Label(self, text="Latest Version: {0}".format(self.gameConfigs['Latest_Version']))
                 VersionsChoice = Tk.OptionMenu(self, self.VersionHolder,*VersionsOps)
-                playBtn = Tk.Button(self, text="Play", command=lambda:self.playGame(self.message))
+                playBtn = Tk.Button(self, text="Play Game", command=lambda:self.playGame(self.message))
                 updateBtn = Tk.Button(self, text="Force Update")
                 uninstallBtn = Tk.Button(self, text="Uninstall", command=self.delGame)
 
                 Title.grid(row=0, column=1, sticky=Tk.NSEW)
                 Version.grid(row=1, column=1, sticky=Tk.NSEW)
-                if configs['KeepVersions'] == "1":
-                    VersionsChoice.grid(row=2, column=1, sticky=Tk.NSEW)
+                VersionsChoice.grid(row=2, column=1, sticky=Tk.NSEW)
                 playBtn.grid(row=3, column=0, sticky=Tk.NSEW)
                 updateBtn.grid(row=3, column=1, sticky=Tk.NSEW)
                 uninstallBtn.grid(row=3, column=2, sticky=Tk.NSEW)
             else:
                 self.log.record("We have detected that there is an update... Just going to workout if we are allowed to auto-update...", "warning")
+                if str(self.gameConfigs['Auto_Update']).strip() == "true":
+                    holder = self.message
+                    self.log.record("We are allowed to do self update...", "info")
+                    ## Going to auto-update to the latest version... Download the new version...
+                    self.changeFrame(-2, "Please wait, we are updating the game!")
+                    returned = self.core.versionGrabber(holder, "version")
+                    self.core.downloadLink(holder, returned.strip())
+                    self.core.updateGameConfig(holder, "Latest_Version", returned.strip())
+                    self.changeFrame(3, holder)
+                elif self.gameConfigs['Auto_Update'] == "false":
+                    self.holder = self.message
+                    self.core.GameNeedsUpdate = True
+                    self.core.LauncherNeedsUpdate = False
+                    self.changeFrame(5, "")
 
         elif self.frame_state == 4:
             """ This is the Developer frame """
@@ -836,6 +849,7 @@ class OtherFrame(Tk.Toplevel):
             Title = Tk.Label(self, text=_tokens[0], font="Helvetica 16 bold")
             Opts = Tk.OptionMenu(self,VersionHolder,*VersionOps)
             Btn = Tk.Button(self, text="Get!", command=lambda:self.getGameVersion(_tokens[-1], VersionHolder.get()))
+
             Title.grid(row=0, column=0, sticky=Tk.NSEW)
             Opts.grid(row=1, column=0, sticky=Tk.NSEW)
             Btn.grid(row=2, column=0, sticky=Tk.NSEW)
@@ -894,16 +908,14 @@ class OtherFrame(Tk.Toplevel):
 
 
     def playGame(self, code):
-        if configs['KeepVersions'] == "1":
-            if 'Game_Folder' in self.gameConfigs:
-                path = "{0}/{1}/{2}/{3}/{4}/{5}".format(self.core.path, "games", code, self.VersionHolder.get(), self.gameConfigs['Game_Folder'].strip(), self.gameConfigs['Launch_File'].strip())
-            else:
-                path = "{0}/{1}/{2}/{3}/{4}".format(self.core.path, "games", code, self.VersionHolder.get(), self.gameConfigs['Launch_File'].strip())
+        if self.VersionHolder.get() == "Latest":
+            version = self.gameConfigs['Latest_Version'].strip()
         else:
-            if 'Game_Folder' in self.gameConfigs:
-                path = "{0}/{1}/{2}/{3}/{4}".format(self.core.path, "games", code, self.gameConfigs['Game_Folder'].strip(), self.gameConfigs['Launch_File'].strip())
-            else:
-                path = "{0}/{1}/{2}/{3}".format(self.core.path, "games", code, self.gameConfigs['Launch_File'].strip())
+            version = str(self.VersionHolder.get())
+        if 'Game_Folder' in self.gameConfigs:
+            path = "{0}/{1}/{2}/{3}/{4}/{5}".format(self.core.path, "games", code, version, self.gameConfigs['Game_Folder'].strip(), self.gameConfigs['Launch_File'].strip())
+        else:
+            path = "{0}/{1}/{2}/{3}/{4}".format(self.core.path, "games", code, version, self.gameConfigs['Launch_File'].strip())
         self.core.startGame(code, path)
 
     #----------------------------------------------------------------------
@@ -990,9 +1002,14 @@ class OtherFrame(Tk.Toplevel):
                 LauncherNeedsUpdate = False
                 self.core.selfModify("", "", 1)
                 self.core.selfModify("Version",str(urllib2.urlopen("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/VERSION").read().strip()),3)
-            elif LauncherNeedsUpdate == False and GameNeedsUpdate == True:
+                self.closeFrame()
+            elif self.core.LauncherNeedsUpdate == False and self.core.GameNeedsUpdate == True:
                 ## This means that it is an update for a game, and not for the Launcher
-                print("")
+                self.log.record("Its the Game that needs the update...", "info")
+                returned = self.core.versionGrabber(self.holder, "version")
+                self.core.downloadLink(self.holder, returned.strip())
+                self.core.updateGameConfig(self.holder, "Latest_Version", returned.strip())
+                self.changeFrame(3, self.holder)
         elif response == "false":
            self.closeFrame()
         else:
@@ -1067,7 +1084,12 @@ class Thinking():
         stringList = ""
         for item in os.listdir("{0}/{1}/{2}/".format(self.path, "games", code)):
             if os.path.isdir("{0}/{1}/{2}/{3}".format(self.path, "games", code, item)):
-                if not item == self.gameConfigs['Game_Folder'].strip():
+                if item == self.gameConfigs['Latest_Version'].strip():
+                    if stringList == "":
+                        stringList += "{0}".format(str("Latest"))
+                    else:
+                        stringList += ",{0}".format(str("Latest"))
+                else:
                     if stringList == "":
                         stringList += "{0}".format(str(item))
                     else:
@@ -1118,7 +1140,7 @@ class Thinking():
         URL = "{0}/Games/{1}/{2}".format(self.baseUrl, code, file)
         result = self.checkUrlItem(URL)
         if result == True:
-            return urllib2.urlopen(URL).read()
+            return urllib2.urlopen(URL).read().strip()
         else:
             ## Returning nothing so then it can make the check easier...
             return ""
@@ -1132,6 +1154,10 @@ class Thinking():
             f.write(zipcontent)
         self.log.record("Done.", "info")
         self.unZipGame(code, version)
+        if not os.path.exists("{0}/{1}/{2}/{3}".format(self.path, "games", code, "config.properties")):
+            with open("{0}/{1}/{2}/{3}".format(self.path, "games", code, "config.properties"), 'w') as out:
+                data = urllib2.urlopen("{0}/Games/{1}/{2}".format(self.baseUrl, code, "config.properties")).read()
+                out.write(data)
 
     #----------------------------------------------------------------------
     def unZipGame(self, code, version):
@@ -1350,6 +1376,33 @@ class Thinking():
         else:
             os.makedirs(path)
 
+    # ----------------------------------------------------------------------
+    def updateGameConfig(self, code, item, value):
+        self.log.record("Asked to update {0}'s config file.".format(code), "info")
+        self.log.record("Replacing {0}'s value with '{1}'".format(item, value), "info")
+        temp = []
+        holder = []
+        _string = ""
+        with open("{0}/{1}/{2}/config.properties".format(self.path, "games", code), 'r') as _in:
+            for line in _in:
+                line = line.strip()
+                temp.append(line)
+        holder.append(temp[0])
+        del temp[0]
+        holder.append(temp[0])
+        del temp[0]
+        for entity in temp:
+            if _string == "":
+                _string += "{0}\n".format(holder[0])
+                _string += "{0}\n".format(holder[1])
+            _tokens = entity.split("=")
+            if _tokens[0] == item:
+                _tokens[1] = value
+            _string += "{0}={1}\n".format(_tokens[0], _tokens[1])
+        with open("{0}/{1}/{2}/config.properties".format(self.path, "games", code), 'w') as out:
+            out.write(_string)
+
+
     #----------------------------------------------------------------------
     def startGame(self, code, path):
         global gameMode
@@ -1458,27 +1511,31 @@ class Thinking():
 
         ## Checking
         if self.VUrl == "Default":
-            self.VUrl = "{0}Games/{1}/version".format(self.baseUrl, code)
+            self.VUrl = "{0}Games/{1}/version".format("https://raw.githubusercontent.com/TheNightForum/TheNightForum.github.io/master/", code)
         self.log.record("Checking '{0}' for new version.".format(str(self.VUrl)), "info")
-
 
         ## Getting online version num
         try:
-            self.onlineGameVersion = float(urllib2.urlopen(str(self.VUrl)).read().strip("\n"))
+            self.onlineGameVersion = urllib2.urlopen(str(self.VUrl)).read().strip()
         except:
-            self.log.record("Could not find online version of '{0}'".format(code.upper()), "error")
+            self.log.record("Could not find online version of '{0}'".format(code.upper()), "warning")
             self.grannyCounter = 5
 
+        print(self.onlineGameVersion)
         ## Comparing the versions...
-        if self.gameConfigs['Version'] > self.onlineGameVersion:
-            # TODO: Something is wrong, we need to fix this, lets self-modify the games config file...
-            self.log.record("Online version number of '{0}' is less than local version".format(code.upper()), "warning")
-            return True
-        elif self.gameConfigs['Version'] < self.onlineGameVersion:
-            self.log.record("New version of '{0}' found.".format(code.upper()), "warning")
-            return True
-        else:
-            self.log.record("Could not find an update for '{0}'.".format(code.upper()), "info")
+        try:
+            if self.gameConfigs['Latest_Version'].strip() > self.onlineGameVersion:
+                # TODO: Something is wrong, we need to fix this, lets self-modify the games config file...
+                self.log.record("Online version number of '{0}' is less than local version".format(code.upper()), "warning")
+                return True
+            elif self.gameConfigs['Latest_Version'].strip() < self.onlineGameVersion:
+                self.log.record("New version of '{0}' found.".format(code.upper()), "warning")
+                return True
+            else:
+                self.log.record("Could not find an update for '{0}'.".format(code.upper()), "info")
+                return False
+        except:
+            self.log.record("Had an issue with comparing game versions...", "error")
             return False
 
     #----------------------------------------------------------------------
@@ -1741,3 +1798,4 @@ if __name__ == "__main__":
     root.highlightthickness = 0
     app = Start(root)
     root.mainloop()
+#hehe
