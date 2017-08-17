@@ -539,7 +539,7 @@ class Start(object):
     #----------------------------------------------------------------------
     def loadProps(self):
         #self.log.record("Loading default properties.", "info")
-        self.props['Version'] = '1.3'
+        self.props['Version'] = '1.4'
         self.props['FirstTime'] = '1'
         self.props['ErrorFrame'] = '1'
         self.props['Logging'] = '7'
@@ -1885,7 +1885,8 @@ class Logger():
     #----------------------------------------------------------------------
     def check(self):
         if os.path.exists("{0}/{1}".format(self.path, "error.log")):
-            self.record("Found an old error log...", "warning")
+            with open("{0}/{1}".format(self.path, "error.log"), "w") as out:
+                out.write("BEGGING!")
 
     ## This function is used to load the logging level from the launcher configs.
     #----------------------------------------------------------------------
@@ -1900,8 +1901,8 @@ class Logger():
         global keeper
         keeper.append("{0}\n".format(_string))
         print(_string)
-        #with open("{0}/{1}".format(self.path, "today.log"), 'a') as out:
-        #    out.write("{0}\n".format(_string))
+        with open("{0}/{1}".format(self.path, "error.log"), 'a') as out:
+            out.write("{0}\n".format(_string))
 
     ## This is the function that generates the "Error Frame" for use by the user.
     #----------------------------------------------------------------------
